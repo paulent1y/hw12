@@ -1,136 +1,98 @@
 package by.paulent1y;
 
-
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.StringJoiner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+public class TriangleTest {
 
-class TriangleTest {
-
-    @Test
-    void testConstructor() {
-        new Triangle(new Point(0, 0), new Point(1, 1), new Point(0, 1));
-        new Triangle(new Point(-2, 2), new Point(-3, 1), new Point(0, 1));
-    }
-
-    @Test
-    void testConstructorNullACase() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(null, new Point(-3, 1), new Point(0, 1)));
-    }
+    //1) Напишите функцию, вычисляющую площадь треугольника по трём сторонам (int a, int b, int c). Разместите класс с функцией в src/main/java.
+    //src/main/.../Triangle.java - класс треугольника. Конструктор позволяет создать треугольник по трем сторонам с проверкой на невозможность построения
 
 
-    @Test
-    void testConstructorNullBCase() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(0, 1), null, new Point(-3, 1)));
-    }
+    //2) Разместите тесты на эту функцию в классе src/test/java/.../TriangleTest.java.
+    //10 тестов ниже, собственно
 
-    @Test
-    void testConstructorNullCCase() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(-3, 1), new Point(0, 1), null));
-    }
 
-    @Test
-    void testConstructorDegenerative1() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(-1, -1), new Point(1, 1), new Point(3, 3)));
-    }
+    //3) Настройте генерацию отчета и по желанию — логирование.
+    //Отчет о тестах сохраняется в target/surefire-reports. С алюром пока не получилось подружиться
+    //Плагин подключен из меню мавен, запускается после билда и создает отчет. Надеюсь так и должно быть
+    //Логгирование самое простое через ванильный java.util.logging.
+    //Даже что то пишет. Но куча красного текста в консоли конечно такое себе
 
-    @Test
-    void testConstructorDegenerative2() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(1, 3), new Point(3, 9), new Point(2, 6)));
-    }
-
-    @Test
-    void testConstructorDegenerative3() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(0, 0), new Point(0, 2), new Point(0, 5)));
-    }
-
-    @Test
-    void testConstructorDegenerative4() {
-        assertThrows(RuntimeException.class, () ->
-                new Triangle(new Point(0, 0), new Point(0, 0), new Point(0, 5)));
-    }
-
+    private final static Logger logger = Logger.getLogger("TriangleTest");
+    @DisplayName("Test for RuntimeError when Triangle is impossible")
     @ParameterizedTest
-    @MethodSource
-    void testArea(final double expected, final double ax, final double ay, final double bx, final double by, final double cx, final double cy) {
-        final Triangle t = t(ax, ay, bx, by, cx, cy);
-        assertEquals(expected, t.area(), 0.0001, () -> "Error in area() on case " + triangleToString(ax, ay, bx, by, cx, cy));
+    @CsvSource({"10,20,30", "3,4,7", "5,3,-1", "0,2,3"})
+    public void testConstructorException(int a, int b, int c) {
+        //Треугольник не может существовать если какая то из его сторон больше суммы двух других
+        //так что тут тест на эксепшен при попытке создания таких треугольников
+        logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
+        Assertions.assertThrows(RuntimeException.class, () -> new Triangle(a,b,c));
     }
 
+    @DisplayName("Constructor test with adequate triangles")
     @ParameterizedTest
-    @MethodSource
-    void testCentroid(final double ax, final double ay, final double bx, final double by, final double cx, final double cy, final Point expected) {
-        final Triangle t = t(ax, ay, bx, by, cx, cy);
-        assertEquals(expected.getX(), t.centroid().getX(), 0.0001, () -> "Error in centroid() on case (X) " + triangleToString(ax, ay, bx, by, cx, cy));
-        assertEquals(expected.getY(), t.centroid().getY(), 0.0001, () -> "Error in centroid() on case (Y) " + triangleToString(ax, ay, bx, by, cx, cy));
+    @MethodSource("testConstructorResources")
+    void testConstructor(int a, int b, int c){
+        //тут попытка взять источником значений метод.
+        // Попробовать попробовал, хотя не до конца понимаю как это вызывается, буду читать дальше
+        logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
+        new Triangle(a,b,c);
     }
 
-    static Stream<Arguments> testArea() {
+    static Stream<Arguments> testConstructorResources(){
+        //собственно метод со значениями
         return Stream.of(
-                Arguments.of(6.00, 0, 0, 4, 0, 0, 3),
-                Arguments.of(4.50, 0, 1, 0, 4, 3, 0),
-                Arguments.of(18.0, 2, 5, -5, 4, 3, 0),
-                Arguments.of(35.0, 8, 2, 1, 2, -2, -8),
-                Arguments.of(13.0, 4, 5, 2, 5, 3, -8),
-                Arguments.of(24.5, 9, 7, 6, 9, 7, -8),
-                Arguments.of(7.50, 4, 9, 4, 6, 9, -8),
-                Arguments.of(5.00, 6, 3, 7, 3, -3, -7),
-                Arguments.of(3.00, 3, 5, 9, 3, 6, 5),
-                Arguments.of(10.0, 8, 2, 3, 7, 3, 3),
-                Arguments.of(4.00, 7, 7, 4, 0, 5, 5),
-                Arguments.of(15.5, 3, 4, 8, 2, 6, 9)
+                Arguments.of(3,4,5),
+                Arguments.of(6,4,3),
+                Arguments.of(5,6,8),
+                Arguments.of(405,17,395)
         );
     }
 
-    static Stream<Arguments> testCentroid() {
-        return Stream.of(
-                Arguments.of(0, 0, 4, 0, 0, 3, new Point(1.3333333333333333, 1.0)),
-                Arguments.of(0, 1, 0, 4, 3, 0, new Point(1.0, 1.6666666666666667)),
-                Arguments.of(2, 5, -5, 4, 3, 0, new Point(0.0, 3.0)),
-                Arguments.of(8, 2, 1, 2, -2, -8, new Point(2.3333333333333335, -1.3333333333333333)),
-                Arguments.of(4, 5, 2, 5, 3, -8, new Point(3.0, 0.6666666666666666)),
-                Arguments.of(9, 7, 6, 9, 7, -8, new Point(7.333333333333333, 2.6666666666666665)),
-                Arguments.of(4, 9, 4, 6, 9, -8, new Point(5.666666666666667, 2.3333333333333335)),
-                Arguments.of(6, 3, 7, 3, -3, -7, new Point(3.3333333333333335, -0.3333333333333333)),
-                Arguments.of(3, 5, 9, 3, 6, 5, new Point(6.0, 4.333333333333333)),
-                Arguments.of(8, 2, 3, 7, 3, 3, new Point(4.666666666666667, 4.0)),
-                Arguments.of(7, 7, 4, 0, 5, 5, new Point(5.333333333333333, 4.0)),
-                Arguments.of(3, 4, 8, 2, 6, 9, new Point(5.666666666666667, 5.0))
-        );
+    @Test
+    @DisplayName("Area test with 3,4,5 triangle")
+    void testArea1(){
+        //т.к. уже попробовал с CSV и методами для значений, это просто тест на значение
+        int a=3,b=4,c=5;
+        logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
+        Triangle t = new Triangle(a,b,c);
+        Assertions.assertEquals(6.0, t.getArea(), 0.0001);
+    }
+    @Test
+    @DisplayName("Area test with 70,70,10 triangle with 1.0 approximation")
+    void testArea2(){
+        //этот тоже, с "примерным" высчитываением значения, прикольно работает если лень досконально считать сколько там должно выйти)
+        //Думается мне что это непрофессионально, но тоже имеет место быть
+        int a=70, b=70, c=10;
+        logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
+        Triangle t = new Triangle(70,70,10);
+        Assertions.assertEquals(350.0, t.getArea(), 1.0);
     }
 
-    private Triangle t(final double ax, final double ay, final double bx, final double by, final double cx, final double cy) {
-        return new Triangle(new Point(ax, ay), new Point(bx, by), new Point(cx, cy));
+    @Test
+    @Disabled // если убрать, в отчет положится что тест упал
+    @DisplayName("Test that fails anyway but disabled")
+    void testThatFails(){
+        Assertions.assertEquals(10,9);
     }
 
-    private String triangleToString(final double ax, final double ay, final double bx, final double by, final double cx, final double cy) {
-        return new StringJoiner(";", "[", "]")
-                .add(new StringJoiner(";", "(", ")")
-                        .add(Double.toString(ax))
-                        .add(Double.toString(ay))
-                        .toString())
-                .add(new StringJoiner(";", "(", ")")
-                        .add(Double.toString(bx))
-                        .add(Double.toString(by))
-                        .toString())
-                .add(new StringJoiner(";", "(", ")")
-                        .add(Double.toString(cx))
-                        .add(Double.toString(cy))
-                        .toString())
-                .toString();
+    @Test
+    @Disabled
+    @DisplayName("Disabled test")
+    void testThatDisabled(){
+        throw new RuntimeException("Exception that should be thrown");
     }
+
 
 }

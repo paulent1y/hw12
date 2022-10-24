@@ -1,5 +1,8 @@
 package by.paulent1y;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Triangle {
     private int sideA;
     private int sideB;
@@ -16,13 +19,14 @@ public class Triangle {
                     sideA + "," +
                     sideB + "," +
                     sideC + " cannot exist";
+            Logger.getLogger("Triangle").log(Level.SEVERE, s);
             throw new RuntimeException(s);
         }
     }
 
     public double getArea(){
         double area, sp;
-        sp = (sideA + sideB + sideC) / 2;
+        sp = ((double)(sideA + sideB + sideC)) / 2;
         System.out.println(sp);
         area = Math.sqrt(sp * (sp - sideA) * (sp - sideB) * (sp - sideC));
         return area;
