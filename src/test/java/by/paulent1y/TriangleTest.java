@@ -45,7 +45,6 @@ public class TriangleTest {
     @MethodSource("testConstructorResources")
     void testConstructor(int a, int b, int c){
         //тут попытка взять источником значений метод.
-        // Попробовать попробовал, хотя не до конца понимаю как это вызывается, буду читать дальше
         logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
         new Triangle(a,b,c);
     }
@@ -63,7 +62,7 @@ public class TriangleTest {
     @Test
     @DisplayName("Area test with 3,4,5 triangle")
     void testArea1(){
-        //т.к. уже попробовал с CSV и методами для значений, это просто тест на значение
+        //т.к. уже попробовал с CSV и методами для значений, это просто тест
         int a=3,b=4,c=5;
         logger.log(Level.INFO, "Testing triangle with sides " + a + "," + b + "," + c);
         Triangle t = new Triangle(a,b,c);
